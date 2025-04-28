@@ -3,7 +3,6 @@
 <head>
     <title>Aurora Box Control</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="favicon.ico">
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="UTF-8">
 </head>
@@ -33,9 +32,15 @@
             </div>
        
             <div class="card">
-                 <h2>Color Palette</h2>
+                 <h2>Waves Color Palette</h2>
 				 <p>
-                 </p>
+		            <button id="fixedPaletteButton" class="onButton">FIXED</button>             
+			        <button id="rotatePaletteButton" class="offButton">ROTATE</button>
+					<form id="paletteNumber">
+					   <label for="paletteNumber">Palette number (0-32)</label><br>
+					   <input type="number" id="paletteNumber" name="paletteNumber" min="0" max="32" /><br><br>
+					</form>
+				 </p>
 				 <p class="gray-label">Current palette: <span id="paletteValue"></span></p>
             </div>
 
@@ -69,11 +74,14 @@
     const disconnectButton = document.getElementById('disconnectBleButton');
     const auroraButton = document.getElementById('auroraButton');
 	const wavesButton = document.getElementById('wavesButton');
+	const fixedPaletteButton = document.getElementById('fixedPaletteButton');
+	const rotatePaletteButton = document.getElementById('rotatePaletteButton');
 	const brighterButton = document.getElementById('brighterButton');
 	const dimmerButton = document.getElementById('dimmerButton');
     const offButton = document.getElementById('offButton');
 	const fasterButton = document.getElementById('fasterButton');
 	const slowerButton = document.getElementById('slowerButton');
+	
 	const brightnessContainer = document.getElementById('brightnessValue');
 	const speedContainer = document.getElementById('speedValue');
 	const paletteContainer = document.getElementById('paletteValue');
@@ -81,23 +89,53 @@
     const bleStateContainer = document.getElementById('bleState');
     const timestampContainer = document.getElementById('timestamp');
 
+
+
     //Define BLE Device Specs
     var deviceName ='Aurora Box';
     var bleService = '19b10000-e8f2-537e-4f6c-d104768a1214';
-    var Control1Characteristic = '19b10001-e8f2-537e-4f6c-d104768a1214';
-    var Control2Characteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
-    var BrightnessCharacteristic= '19b10003-e8f2-537e-4f6c-d104768a1214';
-    var SpeedCharacteristic= '19b10004-e8f2-537e-4f6c-d104768a1214';
-    var PaletteCharacteristic= '19b10005-e8f2-537e-4f6c-d104768a1214';
+    var Control1Characteristic =   '19b10001-e8f2-537e-4f6c-d104768a1214';
+    var Control2Characteristic =   '19b10002-e8f2-537e-4f6c-d104768a1214';
+    var Control3Characteristic =   '19b10003-e8f2-537e-4f6c-d104768a1214';
+	var BrightnessCharacteristic = '19b10004-e8f2-537e-4f6c-d104768a1214';
+    var SpeedCharacteristic =      '19b10005-e8f2-537e-4f6c-d104768a1214';
+    var PaletteCharacteristic =    '19b10006-e8f2-537e-4f6c-d104768a1214';
 
     //Global Variables to Handle Bluetooth
     var bleServer;
     var bleServiceFound;
 	var control1CharacteristicFound;
 	var control2CharacteristicFound;
+	var control3CharacteristicFound;
 	var brightnessCharacteristicFound;
     var speedCharacteristicFound;
     var paletteCharacteristicFound;
+
+
+
+const paletteNumber = document.getElementById('paletteNumber');
+
+paletteNumber.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(paletteNumber);
+
+  fetch('https://4wheeljive.github.io/AuroraBox/index.html', {
+    method: 'POST',
+    body: formData,
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+      // Handle the response from the server
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      // Handle errors
+    });
+});
+
+
 
     // Connect Button (search for BLE Devices only if BLE is available)
     connectButton.addEventListener('click', (event) => {
@@ -115,12 +153,17 @@
     offButton.addEventListener('click', () => writeControl1Characteristic(0));
 	
 	// Write to the Control 2 Characteristic	
-	brighterButton.addEventListener('click', () => writeControl2Characteristic(3));
-    dimmerButton.addEventListener('click', () => writeControl2Characteristic(4));
-    fasterButton.addEventListener('click', () => writeControl2Characteristic(5));
-    slowerButton.addEventListener('click', () => writeControl2Characteristic(6));
-	
-    // Check if BLE is available in your Browser
+	brighterButton.addEventListener('click', () => writeControl2Characteristic(1));
+    dimmerButton.addEventListener('click', () => writeControl2Characteristic(2));
+    fasterButton.addEventListener('click', () => writeControl2Characteristic(3));
+    slowerButton.addEventListener('click', () => writeControl2Characteristic(4));
+
+	// Write to the Control 3 Characteristic	
+	fixedPaletteButton.addEventListener('click', () => writeControl3Characteristic(101));
+    rotatePaletteButton.addEventListener('click', () => writeControl3Characteristic(100));
+
+
+	// Check if BLE is available in your Browser
     function isWebBluetoothEnabled() {
         if (!navigator.bluetooth) {
             console.log("Web Bluetooth API is not available in this browser!");
@@ -274,6 +317,29 @@
             window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
         }
     }
+
+	function writeControl3Characteristic(value){
+        if (bleServer && bleServer.connected) {
+            bleServiceFound.getCharacteristic(Control3Characteristic)
+            .then(characteristic => {
+//                console.log("Found the Control 3 characteristic: ", characteristic.uuid);
+                const data = new Uint8Array([value]);
+                return characteristic.writeValue(data);
+            })
+            .then(() => {
+                latestValueSent.innerHTML = value;
+                console.log("Value written to Control 3 characteristic:", value);
+            })
+            .catch(error => {
+                console.error("Error writing to the Control 3 characteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
+    }
+
+
 
 
     function disconnectDevice() {
