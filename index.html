@@ -141,7 +141,7 @@
 
 	// Write to the Control 3 Characteristic	
 	fixedPaletteButton.addEventListener('click', () => writeControl3Characteristic(101));
-    rotatePaletteButton.addEventListener('click', () => writeControl3Characteristic(102));
+    rotatePaletteButton.addEventListener('click', () => writeControl3Characteristic(100));
     setPalNumForm.addEventListener('submit', function(event) {
 		event.preventDefault();
 		const newPalNum = PalNumInput.value;
