@@ -142,11 +142,13 @@
 	// Write to the Control 3 Characteristic	
 	fixedPaletteButton.addEventListener('click', () => writeControl3Characteristic(101));
     rotatePaletteButton.addEventListener('click', () => writeControl3Characteristic(100));
-    setPalNumForm.addEventListener('submit', function(event) {
+    
+	// Write to the Palette Characteristic
+	setPalNumForm.addEventListener('submit', function(event) {
 		event.preventDefault();
 		const newPalNum = PalNumInput.value;
 		console.log('New palette number:', newPalNum);
-		writeControl3Characteristic(newPalNum);
+		writePaletteCharacteristic(newPalNum);
 		setPalNumForm.reset();
 	});
 
@@ -322,6 +324,28 @@
             window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
         }
     }
+
+	function writePaletteCharacteristic(value){
+        if (bleServer && bleServer.connected) {
+            bleServiceFound.getCharacteristic(PaletteCharacteristic)
+            .then(characteristic => {
+//                console.log("Found the Palette characteristic: ", characteristic.uuid);
+                const data = new Uint8Array([value]);
+                return characteristic.writeValue(data);
+            })
+            .then(() => {
+                latestValueSent.innerHTML = value;
+                console.log("Value written to Palette characteristic:", value);
+            })
+            .catch(error => {
+                console.error("Error writing to the Palette characteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
+    }
+
 
     function disconnectDevice() {
         console.log("Disconnect Device.");
