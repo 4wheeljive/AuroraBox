@@ -11,7 +11,7 @@ The BLE on/off function simply controls whether FastLED displays anything as the
 The physical (capacitive touch) on/off function uses ESP32 deep sleep and external weakeup features.
 
 CREDITS:
-Pattern finctionality:
+Pattern functionality:
  - pride based Pride2015 by Mark Kriegsman (https://gist.github.com/kriegsman/964de772d64c502760e5)
  - waves  based on ColorWavesWithPalettes by Mark Kriegsman (https://gist.github.com/kriegsman/8281905786e8b2632aeb)
  - rainboxmatrix ... trying to recall/locate where I got this; will update when I find it! 
