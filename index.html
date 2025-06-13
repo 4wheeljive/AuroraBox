@@ -25,12 +25,10 @@
             <div class="card">
                  <h2>Pattern</h2>
 				 <p>
-                     <button id="auroraButton" class="onButton">AURORA</button>
+                     <button id="prideButton" class="onButton">PRIDE</button>
 					 <button id="wavesButton" class="onButton">WAVES</button>
 					 <button id="rainbowButton" class="onButton">RAINBOW</button>
-                     <button id="chameleonButton" class="onButton">CHAMELEON</button>
-					 <button id="offButton" class="offButton">OFF</button>
-				 </p>
+                    	 </p>
             </div>
        
             <div class="card">
@@ -78,10 +76,9 @@
 	const connectButton = document.getElementById('connectBleButton');
     const disconnectButton = document.getElementById('disconnectBleButton');
     
-	const auroraButton = document.getElementById('auroraButton');
+	const prideButton = document.getElementById('prideButton');
 	const wavesButton = document.getElementById('wavesButton');
 	const rainbowButton = document.getElementById('rainbowButton');
-	const chameleonButton = document.getElementById('chameleonButton');
     const offButton = document.getElementById('offButton');
 	
 	const fixedPaletteButton = document.getElementById('fixedPaletteButton');
@@ -129,10 +126,9 @@
     disconnectButton.addEventListener('click', disconnectDevice);
 
     // Write to the Control 1 Characteristic
-    auroraButton.addEventListener('click', () => writeControl1Characteristic(2));
+    prideButton.addEventListener('click', () => writeControl1Characteristic(2));
 	wavesButton.addEventListener('click', () => writeControl1Characteristic(3));
 	rainbowButton.addEventListener('click', () => writeControl1Characteristic(4));
-    chameleonButton.addEventListener('click', () => writeControl1Characteristic(5));
     offButton.addEventListener('click', () => writeControl1Characteristic(1));
 	
 	
